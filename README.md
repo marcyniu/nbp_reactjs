@@ -1,9 +1,9 @@
 # nbp_reactjs
 
-NBP conversion currency rates - ReactJS
+NBP currency conversion rates - ReactJS
 
 
-##########################################################################################################################################
+################################################
 ## ReactJS Documentation
 
 # Getting Started with Create React App
