@@ -5,6 +5,7 @@ class TableA extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            pickedTable: 'A',
             isLoaded: false,
             isLoading: false,
             error: null,
@@ -46,7 +47,7 @@ class TableA extends React.Component {
         });
 
         //fetch data:
-        this.fetchTableJsonData('A').then(result => {
+        this.fetchTableJsonData(this.state.pickedTable).then(result => {
             if (typeof result !== 'undefined' && typeof result[0] !== 'undefined') {
                 this.setState({
                     isLoaded: true,
@@ -60,15 +61,30 @@ class TableA extends React.Component {
         });
     }
 
+    handleSelectChange = (event) => {
+        this.setState({pickedTable: event.target.value});
+    }
+
     displayTable = () => {
         const {isLoaded, isLoading, error, effectiveDate, no, table, rates} = this.state;
         return (
             <div>
                 <br></br>
 
-                <button type="button" className="btn btn-primary" onClick={this.getData}>Get data</button>
+                <div className="mb-3 row">
+                    <label className="col-sm-1 col-form-label">Picke table:</label>
+                    <div className="col-sm-1">
+                        <select className="form-select" value={this.state.pickedTable} onChange={this.handleSelectChange}>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                        </select>
+                    </div>
+                    <div className="col-auto">
+                        <button type="button" className="btn btn-primary" onClick={this.getData}>Get data</button>
+                    </div>
+                </div>              
 
-                <br></br>
                 <br></br>
 
                 {
@@ -80,7 +96,7 @@ class TableA extends React.Component {
                 {
                             // When - loading...:
                             isLoaded && !isLoading &&
-                                <h1>Table: <b>{table} #{no}</b> date: <b>{effectiveDate}</b></h1>
+                                <h1>Table: <b>{no}</b> efective date: <b>{effectiveDate}</b></h1>
                 }
             
                 <table className="table">
