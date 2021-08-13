@@ -6,6 +6,7 @@ class TableA extends React.Component {
         super(props);
         this.state = {
             isLoaded: false,
+            isLoading: false,
             error: null,
             effectiveDate: null,
             no: null,
@@ -27,6 +28,7 @@ class TableA extends React.Component {
             this.setState(
                 {
                     isLoaded: true,
+                    isLoading: false,
                     error
                 }
             );
@@ -34,12 +36,21 @@ class TableA extends React.Component {
         
     }
 
-    componentDidMount = () => {
+    // This method is important for ReactJS but not used right now
+    componentDidMount = () => {}
+
+    getData = () => {
+        this.setState({
+            isLoaded: false,
+            isLoading: true
+        });
+
         //fetch data:
         this.fetchTableJsonData('A').then(result => {
             if (typeof result !== 'undefined' && typeof result[0] !== 'undefined') {
                 this.setState({
                     isLoaded: true,
+                    isLoading: false,
                     no: result[0].no,
                     effectiveDate: result[0].effectiveDate,
                     table: result[0].table,
@@ -49,23 +60,31 @@ class TableA extends React.Component {
         });
     }
 
-    displayErrorMessage = () => {
-        const { error } = this.state;
-        return <div>Error: {error.message}</div>
-    }
-
-    displayLoadingMessage = () => (
-        <div>Loading...</div>
-    )
-
     displayTable = () => {
-        const {effectiveDate, no, table, rates} = this.state;
+        const {isLoaded, isLoading, error, effectiveDate, no, table, rates} = this.state;
         return (
             <div>
-                <h1>Table {table} #{no} for {effectiveDate}</h1>
+                <br></br>
+
+                <button type="button" className="btn btn-primary" onClick={this.getData}>Get data</button>
+
+                <br></br>
+                <br></br>
+
+                {
+                            // When - no data:
+                            !isLoaded &&
+                                <h1><br></br></h1>
+                }
+
+                {
+                            // When - loading...:
+                            isLoaded && !isLoading &&
+                                <h1>Table: <b>{table} #{no}</b> date: <b>{effectiveDate}</b></h1>
+                }
             
-                <table>
-                    <thead>
+                <table className="table">
+                    <thead className="table-dark">
                         <tr>
                             <th>Currency</th>
                             <th>Code</th>
@@ -73,35 +92,50 @@ class TableA extends React.Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {rates.map((rate, idx) => (
-                            <tr key={idx}>
-                                <td>
-                                    {rate.currency}
-                                </td>
-                                <td>
-                                    {rate.code}
-                                </td>
-                                <td>
-                                    {rate.mid}
-                                </td> 
-                            </tr>
-                        ))}
+                        {
+                            // Table:
+                            isLoaded &&
+                                    rates.map((rate, idx) => (
+                                        <tr key={idx}>
+                                            <td>
+                                                {rate.currency}
+                                            </td>
+                                            <td>
+                                                {rate.code}
+                                            </td>
+                                            <td>
+                                                {rate.mid}
+                                            </td> 
+                                        </tr>
+                                    ))
+                        }
+
+                        {
+                            // When - no data:
+                            !isLoaded && !isLoading &&
+                                <tr><td colSpan="3">No data...</td></tr>        
+                        }
+
+                        {
+                            // When - loading...:
+                            !isLoaded && isLoading &&
+                                <tr><td colSpan="3">Loading...</td></tr>
+                        }
+
+                        {
+                            // When - error:
+                            isLoaded && error &&
+                                <tr><td colSpan="3" style={{color: "#FF0000"}}>Error: {error.message}</td></tr>
+                        }                      
                     </tbody>
                 </table>
             </div>
         );  
     }
 
+
     render = () => {
-        const { error, isLoaded } = this.state;
-        if (error) {
-            return this.displayErrorMessage()
-        } else if (!isLoaded) {
-            return this.displayLoadingMessage()
-        } else {
-            return this.displayTable()
-        }
-        
+        return this.displayTable()
     }
 }
 
