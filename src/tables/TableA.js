@@ -14,11 +14,30 @@ class TableA extends React.Component {
         };
     }
 
+    fetchTableJsonData = async (tableName) => {
+        try {
+            let url = 'http://api.nbp.pl/api/exchangerates/tables/' + tableName + '/?format=json'
+            let response = await fetch(url);
+            if (response.ok) {
+                return await response.json();
+            } else {
+                throw new Error('HTTP error! status: ' + response.status + '. Original message: ' + response.statusText);
+            }
+        } catch(error) {
+            this.setState(
+                {
+                    isLoaded: true,
+                    error
+                }
+            );
+        }
+        
+    }
+
     componentDidMount = () => {
-        console.log('componentDidMount');
-        fetch('http://api.nbp.pl/api/exchangerates/tables/A/?format=json')
-            .then(response => response.json())
-            .then((result) => {
+        //fetch data:
+        this.fetchTableJsonData('A').then(result => {
+            if (typeof result !== 'undefined' && typeof result[0] !== 'undefined') {
                 this.setState({
                     isLoaded: true,
                     no: result[0].no,
@@ -26,13 +45,8 @@ class TableA extends React.Component {
                     table: result[0].table,
                     rates: result[0].rates
                 })
-            },
-            (error) => {
-                this.setState({
-                    isLoaded: true,
-                    error
-                });
-            });
+            }
+        });
     }
 
     displayErrorMessage = () => {
@@ -59,8 +73,8 @@ class TableA extends React.Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {rates.map(rate => (
-                            <tr key={rate.currency}>
+                        {rates.map((rate, idx) => (
+                            <tr key={idx}>
                                 <td>
                                     {rate.currency}
                                 </td>
