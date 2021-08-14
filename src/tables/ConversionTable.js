@@ -1,6 +1,6 @@
 import React from "react";
 
-class TableA extends React.Component {
+class ConversionTable extends React.Component {
 
     constructor(props) {
         super(props);
@@ -62,11 +62,15 @@ class TableA extends React.Component {
     }
 
     handleSelectChange = (event) => {
-        this.setState({pickedTable: event.target.value});
+        this.setState({
+            pickedTable: event.target.value,
+            isLoaded: false,
+            rates: []
+        });
     }
 
     displayTable = () => {
-        const {isLoaded, isLoading, error, effectiveDate, no, table, rates} = this.state;
+        const {isLoaded, isLoading, error, effectiveDate, no, pickedTable, rates} = this.state;
         return (
             <div>
                 <br></br>
@@ -81,68 +85,83 @@ class TableA extends React.Component {
                         </select>
                     </div>
                     <div className="col-auto">
-                        <button type="button" className="btn btn-primary" onClick={this.getData}>Get data</button>
+                        <button type="button" className="btn btn-primary" onClick={this.getData}>Get courses</button>
                     </div>
                 </div>              
 
                 <br></br>
 
                 {
-                            // When - no data:
-                            !isLoaded &&
-                                <h1><br></br></h1>
+                    // When - no data:
+                    !isLoaded &&
+                        <h1><br></br></h1>
                 }
 
                 {
-                            // When - loading...:
-                            isLoaded && !isLoading &&
-                                <h1>Table: <b>{no}</b> efective date: <b>{effectiveDate}</b></h1>
+                    // When - loading...:
+                    isLoaded && !isLoading &&
+                        <h1>Table: <b style={{color: "#0d6efd"}}>{no}</b> &nbsp;&nbsp;&nbsp; efective date: <b style={{color: "#0d6efd"}}>{effectiveDate}</b></h1>
                 }
-            
                 <table className="table">
                     <thead className="table-dark">
-                        <tr>
+
+                    {
+                        // Table head:
+                        pickedTable === 'C'
+                        ? <tr>
+                            <th>Currency</th>
+                            <th>Code</th>
+                            <th>Ask</th>
+                            <th>Bid</th>
+                          </tr>
+                        : <tr>
                             <th>Currency</th>
                             <th>Code</th>
                             <th>Course</th>
-                        </tr>
+                          </tr>
+                    }
+            
                     </thead>
                     <tbody>
-                        {
-                            // Table:
-                            isLoaded &&
-                                    rates.map((rate, idx) => (
-                                        <tr key={idx}>
-                                            <td>
-                                                {rate.currency}
-                                            </td>
-                                            <td>
-                                                {rate.code}
-                                            </td>
-                                            <td>
-                                                {rate.mid}
-                                            </td> 
-                                        </tr>
-                                    ))
-                        }
 
-                        {
-                            // When - no data:
-                            !isLoaded && !isLoading &&
-                                <tr><td colSpan="3">No data...</td></tr>        
-                        }
+                    {
+                        // Table body:
+                        pickedTable === 'C'
+                        ? rates.map((rate, idx) => (
+                            <tr key={idx}>
+                                <td>{rate.currency}</td>
+                                <td>{rate.code}</td>
+                                <td>{rate.ask}</td>
+                                <td>{rate.bid}</td>
+                            </tr>
+                        ))
+                        : rates.map((rate, idx) => (
+                            <tr key={idx}>
+                                <td>{rate.currency}</td>
+                                <td>{rate.code}</td>
+                                <td>{rate.mid}</td> 
+                            </tr>
+                        ))
+                    }
+                
+                    {
+                        // When - no data:
+                        !isLoaded && !isLoading &&
+                            <tr><td colSpan="4">No data...</td></tr>        
+                    }
 
-                        {
-                            // When - loading...:
-                            !isLoaded && isLoading &&
-                                <tr><td colSpan="3">Loading...</td></tr>
-                        }
+                    {
+                        // When - loading...:
+                        !isLoaded && isLoading &&
+                            <tr><td colSpan="4">Loading...</td></tr>
+                    }
 
-                        {
-                            // When - error:
-                            isLoaded && error &&
-                                <tr><td colSpan="3" style={{color: "#FF0000"}}>Error: {error.message}</td></tr>
-                        }                      
+                    {
+                        // When - error:
+                        isLoaded && error &&
+                            <tr><td colSpan="4" style={{color: "#FF0000"}}>Error: {error.message}</td></tr>
+                    }
+
                     </tbody>
                 </table>
             </div>
@@ -156,4 +175,4 @@ class TableA extends React.Component {
 }
 
 
-export default TableA;
+export default ConversionTable;

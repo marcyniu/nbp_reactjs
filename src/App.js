@@ -1,11 +1,11 @@
 import './App.css';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css'
-import TableA from './tables/TableA'
+import ConversionTable from './tables/ConversionTable'
 
 function App() {
   return (
     <div className="App">
-      <TableA></TableA>
+      <ConversionTable></ConversionTable>
     </div>
   );
 }
